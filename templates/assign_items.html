@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Items - Check Splitter{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-tasks me-2"></i>Assign Items
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    <!-- People List -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">People</h5>
+                        <div class="list-group">
+                            {% for name in people_names %}
+                            <div class="list-group-item">
+                                <i class="fas fa-user me-2"></i>{{ name }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Items Section -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Items</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Price</th>
+                                        <th>Assign To</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in parsed_data['items'] %}
+                                    <tr>
+                                        <td>{{ item.name }}</td>
+                                        <td>${{ "%.2f"|format(item.price) }}</td>
+                                        <td>
+                                            <select class="form-select item-assignment" 
+                                                    name="item_{{ loop.index0 }}[]" 
+                                                    multiple 
+                                                    size="{{ people_names|length }}"
+                                                    required>
+                                                {% for name in people_names %}
+                                                <option value="{{ name }}">{{ name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Please assign this item to at least one person.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Summary Section -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Receipt Summary</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p class="mb-1">Subtotal</p>
+                                <h6>${{ "%.2f"|format(parsed_data['subtotal']) }}</h6>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1">Tax</p>
+                                <h6>${{ "%.2f"|format(parsed_data['tax']) }}</h6>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1">Tip</p>
+                                <h6>${{ "%.2f"|format(parsed_data['tip']) }}</h6>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1">Total</p>
+                                <h6>${{ "%.2f"|format(parsed_data['total']) }}</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('safety') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            Calculate Split<i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Check if all items are assigned
+        document.querySelectorAll('.item-assignment').forEach(select => {
+            if (select.selectedOptions.length === 0) {
+                select.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                select.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        form.classList.add('was-validated');
+    });
+    
+    // Convert multiple selects into custom dropdown lists
+    document.querySelectorAll('.item-assignment').forEach(select => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-assignment-wrapper';
+        
+        // Create a button to show/hide options
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-outline-secondary dropdown-toggle w-100 text-start';
+        button.innerHTML = '<span class="selected-names">Click to assign</span>';
+        
+        // Create the dropdown container
+        const dropdown = document.createElement('div');
+        dropdown.className = 'custom-assignment-dropdown';
+        
+        // Create checkboxes for each option
+        Array.from(select.options).forEach(option => {
+            const label = document.createElement('label');
+            label.className = 'custom-assignment-option';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = option.value;
+            checkbox.className = 'me-2';
+            
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(option.text));
+            dropdown.appendChild(label);
+            
+            // Update select when checkbox changes
+            checkbox.addEventListener('change', function() {
+                const opt = Array.from(select.options).find(o => o.value === this.value);
+                if (opt) {
+                    opt.selected = this.checked;
+                }
+                updateSelectedNames(select, button);
+                select.classList.remove('is-invalid');
+            });
+        });
+        
+        // Toggle dropdown on button click
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isActive = dropdown.classList.contains('active');
+            // Close all other dropdowns
+            document.querySelectorAll('.custom-assignment-dropdown.active').forEach(d => {
+                if (d !== dropdown) {
+                    d.classList.remove('active');
+                }
+            });
+            dropdown.classList.toggle('active');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            dropdown.classList.remove('active');
+        });
+        
+        dropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // Function to update the button text
+        function updateSelectedNames(select, button) {
+            const selectedNames = Array.from(select.selectedOptions).map(o => o.text);
+            const span = button.querySelector('.selected-names');
+            span.textContent = selectedNames.length ? selectedNames.join(', ') : 'Click to assign';
+            button.classList.toggle('has-selections', selectedNames.length > 0);
+        }
+        
+        // Hide the original select
+        select.style.display = 'none';
+        
+        // Add the new elements
+        wrapper.appendChild(button);
+        wrapper.appendChild(dropdown);
+        select.parentNode.insertBefore(wrapper, select);
+    });
+});
+</script>
+
+<style>
+.custom-assignment-wrapper {
+    position: relative;
+}
+
+.custom-assignment-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    margin-top: 0.25rem;
+    padding: 0.5rem;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.custom-assignment-dropdown.active {
+    display: block;
+}
+
+.custom-assignment-option {
+    display: block;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    user-select: none;
+}
+
+.custom-assignment-option:hover {
+    background-color: #f8f9fa;
+}
+
+.custom-assignment-option input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.dropdown-toggle.has-selections {
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.selected-names {
+    display: inline-block;
+    max-width: calc(100% - 20px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
+{% endblock %} 

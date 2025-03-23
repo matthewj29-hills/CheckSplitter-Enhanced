@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Receipt Data - Check Splitter{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-check-circle me-2"></i>Verify Receipt Data
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    <!-- Number of People -->
+                    <div class="mb-4">
+                        <label for="num_people" class="form-label">Number of People</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-users"></i>
+                            </span>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="num_people" 
+                                   name="num_people" 
+                                   min="1" 
+                                   value="1" 
+                                   required>
+                            <div class="invalid-feedback">
+                                Please enter a valid number of people (minimum 1).
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- People Names -->
+                    <div id="people_names_container" class="mb-4">
+                        <div class="mb-3">
+                            <label class="form-label">Person 1</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="person_name_0" 
+                                   placeholder="Enter name"
+                                   required>
+                            <div class="invalid-feedback">
+                                Please enter a name.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items Section -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Items</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="items_tbody">
+                                    {% for item in parsed_data['items'] %}
+                                    <tr>
+                                        <td>
+                                            <input type="text" 
+                                                   class="form-control item-name" 
+                                                   name="item_name_{{ loop.index0 }}" 
+                                                   value="{{ item.name }}" 
+                                                   required>
+                                        </td>
+                                        <td>
+                                            <input type="number" 
+                                                   class="form-control item-quantity" 
+                                                   name="item_quantity_{{ loop.index0 }}" 
+                                                   value="1" 
+                                                   min="1" 
+                                                   required>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control item-price" 
+                                                       name="item_price_{{ loop.index0 }}" 
+                                                       value="{{ "%.2f"|format(item.price) }}" 
+                                                       step="0.01" 
+                                                       min="0.01" 
+                                                       required>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger btn-sm remove-item">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="add_item">
+                            <i class="fas fa-plus me-1"></i>Add Item
+                        </button>
+                    </div>
+
+                    <!-- Totals Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label">Subtotal</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       name="subtotal" 
+                                       id="subtotal"
+                                       value="{{ "%.2f"|format(parsed_data['subtotal']) }}" 
+                                       step="0.01" 
+                                       min="0" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tax</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       name="tax" 
+                                       id="tax"
+                                       value="{{ "%.2f"|format(parsed_data['tax']) }}" 
+                                       step="0.01" 
+                                       min="0" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tip</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       name="tip" 
+                                       id="tip"
+                                       value="{{ "%.2f"|format(parsed_data['tip']) }}" 
+                                       step="0.01" 
+                                       min="0" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Total</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       name="total" 
+                                       id="total"
+                                       value="{{ "%.2f"|format(parsed_data['total']) }}" 
+                                       step="0.01" 
+                                       min="0" 
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            Continue<i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const numPeopleInput = document.getElementById('num_people');
+    const peopleNamesContainer = document.getElementById('people_names_container');
+    const itemsTable = document.getElementById('items_tbody');
+    const addItemBtn = document.getElementById('add_item');
+    const subtotalInput = document.getElementById('subtotal');
+    const taxInput = document.getElementById('tax');
+    const tipInput = document.getElementById('tip');
+    const totalInput = document.getElementById('total');
+    
+    // Helper function to round to 2 decimal places
+    function roundToTwo(num) {
+        return Number(Math.round(num + 'e2') + 'e-2');
+    }
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Check if names are filled
+        const nameInputs = form.querySelectorAll('input[name^="person_name_"]');
+        let namesValid = true;
+        nameInputs.forEach(input => {
+            if (!input.value.trim()) {
+                namesValid = false;
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+        
+        // Remove any existing error messages
+        const existingAlert = form.querySelector('.alert');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+        
+        // Calculate subtotal from items
+        const prices = Array.from(itemsTable.querySelectorAll('.item-price')).map(input => {
+            return Number(input.value) || 0;
+        });
+        
+        const calculatedSubtotal = roundToTwo(prices.reduce((a, b) => a + b, 0));
+        const currentSubtotal = roundToTwo(Number(subtotalInput.value));
+        
+        // Validate subtotal
+        if (calculatedSubtotal !== currentSubtotal) {
+            const div = document.createElement('div');
+            div.className = 'alert alert-danger';
+            div.textContent = "Subtotal doesn't match item prices";
+            form.insertBefore(div, form.firstChild);
+            return;
+        }
+        
+        // If all validations pass, submit the form
+        if (namesValid && form.checkValidity()) {
+            form.submit();
+        } else {
+            form.classList.add('was-validated');
+        }
+    });
+
+    // Handle number of people changes
+    function updatePeopleNames() {
+        const numPeople = parseInt(numPeopleInput.value) || 1;
+        peopleNamesContainer.innerHTML = '';
+        
+        for (let i = 0; i < numPeople; i++) {
+            const div = document.createElement('div');
+            div.className = 'mb-3';
+            div.innerHTML = `
+                <label class="form-label">Person ${i + 1}</label>
+                <input type="text" 
+                       class="form-control" 
+                       name="person_name_${i}" 
+                       placeholder="Enter name"
+                       required>
+                <div class="invalid-feedback">
+                    Please enter a name.
+                </div>
+            `;
+            peopleNamesContainer.appendChild(div);
+        }
+    }
+    
+    numPeopleInput.addEventListener('input', updatePeopleNames);
+    updatePeopleNames(); // Initial setup
+
+    // Handle adding new items
+    function addNewItem() {
+        const newRow = document.createElement('tr');
+        const index = itemsTable.children.length;
+        newRow.innerHTML = `
+            <td>
+                <input type="text" 
+                       class="form-control item-name" 
+                       name="item_name_${index}" 
+                       required>
+            </td>
+            <td>
+                <input type="number" 
+                       class="form-control item-quantity" 
+                       name="item_quantity_${index}" 
+                       value="1" 
+                       min="1" 
+                       required>
+            </td>
+            <td>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" 
+                           class="form-control item-price" 
+                           name="item_price_${index}" 
+                           step="0.01" 
+                           min="0.01" 
+                           required>
+                </div>
+            </td>
+            <td>
+                <button type="button" class="btn btn-outline-danger btn-sm remove-item">
+                    <i class="fas fa-times"></i>
+                </button>
+            </td>
+        `;
+        itemsTable.appendChild(newRow);
+        updateTotals();
+    }
+    
+    addItemBtn.addEventListener('click', addNewItem);
+
+    // Handle removing items
+    itemsTable.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-item')) {
+            e.target.closest('tr').remove();
+            updateTotals();
+        }
+    });
+
+    // Update totals when item prices change
+    function updateTotals() {
+        const tax = roundToTwo(Number(taxInput.value) || 0);
+        const tip = roundToTwo(Number(tipInput.value) || 0);
+        const subtotal = roundToTwo(Number(subtotalInput.value) || 0);
+        
+        // Update total based on current subtotal, tax, and tip
+        totalInput.value = roundToTwo(subtotal + tax + tip).toFixed(2);
+    }
+
+    // Add event listeners for tax and tip changes
+    taxInput.addEventListener('input', updateTotals);
+    tipInput.addEventListener('input', updateTotals);
+});
+</script>
+{% endblock %}

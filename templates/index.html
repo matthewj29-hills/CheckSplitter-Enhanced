@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Receipt - Check Splitter{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-upload me-2"></i>Upload Receipt
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-receipt fa-3x text-primary mb-3"></i>
+                    <h5>Split Your Check Easily</h5>
+                    <p class="text-muted">Upload a clear photo of your receipt to get started</p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <div class="mb-4">
+                        <div class="upload-area p-4 text-center border rounded" 
+                             style="border: 2px dashed #ddd !important; cursor: pointer;"
+                             onclick="document.getElementById('receipt').click()">
+                            <input type="file" 
+                                   id="receipt" 
+                                   name="receipt" 
+                                   accept="image/*" 
+                                   class="d-none" 
+                                   required>
+                            <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
+                            <p class="mb-0">Click or drag to upload your receipt</p>
+                            <small class="text-muted">Supported formats: JPG, PNG, GIF</small>
+                        </div>
+                        <div id="preview" class="mt-3 text-center d-none">
+                            <img id="preview-image" src="" alt="Receipt preview" class="img-fluid rounded" style="max-height: 200px;">
+                            <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="clearPreview()">
+                                <i class="fas fa-times me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-cog me-2"></i>Process Receipt
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Manual Input Option -->
+                <div class="text-center mt-4">
+                    <div class="divider d-flex align-items-center my-4">
+                        <div class="flex-grow-1 border-bottom"></div>
+                        <span class="mx-3 text-muted">OR</span>
+                        <div class="flex-grow-1 border-bottom"></div>
+                    </div>
+                    <p class="text-muted mb-3">Having trouble with the photo?</p>
+                    <a href="{{ url_for('manual_entry') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-keyboard me-2"></i>Enter Items Manually
+                    </a>
+                </div>
+
+                <div class="mt-4">
+                    <h6 class="text-center mb-3">Tips for Best Results</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-camera text-primary mb-2"></i>
+                                <p class="small mb-0">Take a clear, well-lit photo</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-align-center text-primary mb-2"></i>
+                                <p class="small mb-0">Keep the receipt straight</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-lightbulb text-primary mb-2"></i>
+                                <p class="small mb-0">Ensure good lighting</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.divider {
+    position: relative;
+}
+
+.divider .border-bottom {
+    border-bottom: 1px solid #dee2e6 !important;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('receipt');
+    const preview = document.getElementById('preview');
+    const previewImage = document.getElementById('preview-image');
+    const uploadArea = document.querySelector('.upload-area');
+
+    // Handle file selection
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                preview.classList.remove('d-none');
+                uploadArea.style.borderColor = '#4a90e2';
+                uploadArea.style.backgroundColor = '#f8f9fa';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Handle drag and drop
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#4a90e2';
+        uploadArea.style.backgroundColor = '#f8f9fa';
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#ddd';
+        uploadArea.style.backgroundColor = 'white';
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#ddd';
+        uploadArea.style.backgroundColor = 'white';
+        
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            fileInput.files = e.dataTransfer.files;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                preview.classList.remove('d-none');
+                uploadArea.style.borderColor = '#4a90e2';
+                uploadArea.style.backgroundColor = '#f8f9fa';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            alert('Please upload an image file.');
+        }
+    });
+
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        if (!fileInput.files.length) {
+            e.preventDefault();
+            alert('Please select a receipt image.');
+        }
+    });
+});
+
+function clearPreview() {
+    document.getElementById('receipt').value = '';
+    document.getElementById('preview').classList.add('d-none');
+    document.querySelector('.upload-area').style.borderColor = '#ddd';
+    document.querySelector('.upload-area').style.backgroundColor = 'white';
+}
+</script>
+{% endblock %} 

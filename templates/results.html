@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Check Splitter{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-receipt me-2"></i>Final Split Results
+                </h4>
+            </div>
+            <div class="card-body">
+                <!-- Individual Costs -->
+                <div class="mb-4">
+                    <h5 class="mb-3">Individual Totals</h5>
+                    <div class="row">
+                        {% for person, amount in individual_costs.items() %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-primary">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-user me-2"></i>{{ person }}
+                                    </h5>
+                                    <h3 class="text-primary mb-0">${{ amount }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Item Breakdown -->
+                <div class="mb-4">
+                    <h5 class="mb-3">Item Breakdown</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Price</th>
+                                    <th>Split Between</th>
+                                    <th>Cost Per Person</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in parsed_data['items'] %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td>${{ "%.2f"|format(item.price) }}</td>
+                                    <td>
+                                        {% set assigned = item_assignments[item.name] %}
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for person in assigned %}
+                                            <span class="badge bg-primary">{{ person }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td>${{ "%.2f"|format(item.price / assigned|length) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Receipt Summary -->
+                <div class="mb-4">
+                    <h5 class="mb-3">Receipt Summary</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p class="mb-1">Subtotal</p>
+                            <h6>${{ "%.2f"|format(parsed_data['subtotal']) }}</h6>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="mb-1">Tax</p>
+                            <h6>${{ "%.2f"|format(parsed_data['tax']) }}</h6>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="mb-1">Tip</p>
+                            <h6>${{ "%.2f"|format(parsed_data['tip']) }}</h6>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="mb-1">Total</p>
+                            <h6>${{ "%.2f"|format(parsed_data['total']) }}</h6>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('assign_items') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        Start New Split<i class="fas fa-plus ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
