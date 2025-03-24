@@ -1,7 +1,9 @@
 tesseract-ocr
 tesseract-ocr-eng
-libgl1-mesa-glx
+libgl1
 libglib2.0-0
 libsm6
 libxext6
 libxrender-dev
+libglu1-mesa
+libglu1-mesa-dev
