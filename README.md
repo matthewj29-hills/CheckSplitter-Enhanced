@@ -2,6 +2,46 @@
 
 A modern web application that helps users split restaurant bills effortlessly using OCR technology. This enhanced version features improved receipt parsing accuracy, a beautiful user interface, and better user experience.
 
+## Demo
+
+### Home Page
+[Screenshot of the home page with drag-and-drop interface will be placed here]
+
+### Receipt Processing
+[Screenshot of the receipt processing page with extracted items will be placed here]
+
+### Split Configuration
+[Screenshot of the split configuration page where users assign items will be placed here]
+
+### Results Page
+[Screenshot of the final results page showing the split calculations will be placed here]
+
+## Example Receipt
+
+Below is an example of how the application processes a sample receipt:
+
+### Sample Receipt
+[Grey Goose receipt image will be placed here]
+
+### Extracted Items
+```json
+{
+  "items": [
+    {"name": "Chicken Burger", "price": 8.79, "quantity": 1},
+    {"name": "Large Drink", "price": 4.99, "quantity": 1},
+    {"name": "French Fries", "price": 3.79, "quantity": 1},
+    {"name": "Grey Goose Lime 1", "price": 9.69, "quantity": 1},
+    {"name": "Grey Goose Lime 2", "price": 9.69, "quantity": 1},
+    {"name": "Grill Octopus", "price": 17.99, "quantity": 1},
+    {"name": "Oysters Green NZ", "price": 22.79, "quantity": 1},
+    {"name": "Salmon Tartar", "price": 15.99, "quantity": 1}
+  ],
+  "subtotal": 93.72,
+  "tax": 5.33,
+  "total": 99.05
+}
+```
+
 ## Features
 
 - 📸 Upload receipt photos with drag-and-drop support
