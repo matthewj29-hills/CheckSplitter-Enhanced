@@ -19,7 +19,7 @@ def round_decimal(value: Decimal) -> Decimal:
     return Decimal(value).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
 # Set Tesseract path for Windows
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = "/app/.apt/usr/bin/tesseract"
 
 @dataclass
 class ReceiptItem:
