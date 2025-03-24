@@ -2,7 +2,9 @@
 
 A modern web application that helps users split restaurant bills effortlessly using OCR technology. This enhanced version features improved receipt parsing accuracy, a beautiful user interface, and better user experience.
 
-## Demo
+## Project Status
+'''
+The heroku hosting sight has ran out of memory, the heroku webspage is currently out of order while I search for alternate hosting/viewing alternatives. 
 
 ### Home Page
 <img width="638" alt="image" src="https://github.com/user-attachments/assets/733e2a33-3243-477a-bc01-deb60dacadb8" />
