@@ -29,24 +29,37 @@ A modern web application that helps users split restaurant bills effortlessly us
 ## Features
 
 - 📸 Upload receipt photos with drag-and-drop support
-- 🔍 Advanced OCR with multiple engines for better accuracy
-- ✨ Modern, responsive user interface
-- 📱 Mobile-friendly design
-- 🔄 Real-time data validation
-- 📊 Detailed split calculations
-- 🖨️ Print-friendly results
-- 🔗 Share functionality
-- 💰 Support for shared items
-- 🧮 Automatic tax and tip calculations
+- 🔍 Dual OCR engine system (Tesseract + EasyOCR) for enhanced text extraction
+- ✨ Clean, modern Bootstrap 5 interface
+- 📱 Responsive design for all devices
+- 🔄 Intelligent receipt parsing with pattern recognition
+- 📊 Automatic item detection and price extraction
+- 🧮 Smart quantity detection and price splitting
+- 💰 Support for multiple items with quantity > 1
+- 📝 Automatic restaurant name detection
+- 🔍 Built-in receipt validation and error handling
 
 ## Technology Stack
 
-- Python/Flask
-- OpenCV for image processing
-- Tesseract OCR + EasyOCR for text extraction
-- Bootstrap 5 for responsive design
-- Font Awesome for icons
-- Heroku for deployment
+- **Backend:**
+  - Python 3.x
+  - Flask web framework
+  - OpenCV (opencv-python-headless) for image preprocessing
+  - Tesseract OCR for primary text extraction
+  - EasyOCR for secondary text extraction and validation
+  - NumPy for numerical operations
+  - Pillow for image processing
+
+- **Frontend:**
+  - Bootstrap 5 for responsive design
+  - Font Awesome for icons
+  - HTML5/CSS3 for layout and styling
+
+- **Deployment:**
+  - Heroku platform
+  - Gunicorn production server
+  - Ubuntu 24.04 (Heroku-24 stack)
+
 
 ## Installation
 
