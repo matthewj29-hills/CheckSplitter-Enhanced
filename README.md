@@ -5,7 +5,7 @@ A modern web application that helps users split restaurant bills effortlessly us
 ## Demo
 
 ### Home Page
-<img width="638" alt="image" src="https://github.com/user-attachments/assets/e8fe5728-0f2b-4284-9536-4b2d087e3e88" />
+<img width="638" alt="image" src="https://github.com/user-attachments/assets/733e2a33-3243-477a-bc01-deb60dacadb8" />
 
 
 ### Receipt Processing
@@ -13,14 +13,13 @@ A modern web application that helps users split restaurant bills effortlessly us
 
 
 ### Split Configuration
-[Screenshot of the split configuration page where users assign items will be placed here]
+<img width="639" alt="image" src="https://github.com/user-attachments/assets/41f7bfde-b3d7-47b6-acaa-850c62e930ff" />
+
 
 ### Results Page
-[Screenshot of the final results page showing the split calculations will be placed here]
+<img width="639" alt="image" src="https://github.com/user-attachments/assets/175123a1-c380-4d40-be13-0801e10292cd" />
 
-## Example Receipt
 
-Below is an example of how the application processes a sample receipt:
 
 ### Sample Receipt
 <img width="242" alt="Screenshot 2025-01-13 195025" src="https://github.com/user-attachments/assets/72865599-80a4-467a-bb66-268102972de9" />
